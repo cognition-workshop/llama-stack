@@ -58,7 +58,9 @@ class DistributionInspectImpl(Inspect):
         return ListRoutesResponse(data=ret)
 
     async def health(self) -> HealthInfo:
-        return HealthInfo(status="OK")
+        from llama_stack.utils.gpu_utils import get_gpu_info
+        gpu_info = get_gpu_info()
+        return HealthInfo(status="OK", gpu_info=gpu_info)
 
     async def version(self) -> VersionInfo:
         return VersionInfo(version=version("llama-stack"))
