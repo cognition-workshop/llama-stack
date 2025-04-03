@@ -367,14 +367,16 @@ class DatasetsRoutingTable(CommonRoutingTableImpl, Datasets):
     ) -> None:
         if provider_dataset_id is None:
             provider_dataset_id = dataset_id
+            
         if provider_id is None:
-            # If provider_id not specified, use the only provider if it supports this dataset
-            if len(self.impls_by_provider_id) == 1:
-                provider_id = list(self.impls_by_provider_id.keys())[0]
+            if url.startswith("huggingface"):
+                provider_id = "huggingface"
             else:
-                raise ValueError(
-                    "No provider specified and multiple providers available. Please specify a provider_id."
-                )
+                provider_id = "localfs"
+        
+        if provider_id not in self.impls_by_provider_id:
+            raise ValueError(f"Provider '{provider_id}' not found in available providers: {list(self.impls_by_provider_id.keys())}")
+            
         if metadata is None:
             metadata = {}
         dataset = Dataset(
