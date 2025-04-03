@@ -4,7 +4,7 @@
 # This source code is licensed under the terms described in the LICENSE file in
 # the root directory of this source tree.
 
-from typing import List, Protocol, runtime_checkable
+from typing import List, Optional, Protocol, runtime_checkable
 
 from pydantic import BaseModel
 
@@ -26,8 +26,18 @@ class RouteInfo(BaseModel):
 
 
 @json_schema_type
+class GPUInfo(BaseModel):
+    index: int
+    name: str
+    memory_used: int  # MB
+    memory_total: int  # MB
+    utilization: float  # percentage (0-100)
+
+
+@json_schema_type
 class HealthInfo(BaseModel):
     status: str
+    gpu_info: Optional[List[GPUInfo]] = None
     # TODO: add a provider level status
 
 

@@ -31,6 +31,7 @@ dependencies = [
     "prompt-toolkit",
     "python-dotenv",
     "pydantic>=2",
+    "pynvml>=11.5.0",
     "requests",
     "rich",
     "setuptools",
