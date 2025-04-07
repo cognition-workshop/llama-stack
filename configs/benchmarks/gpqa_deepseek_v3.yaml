@@ -1,0 +1,12 @@
+benchmark_id: meta-reference-gpqa-cot
+dataset:
+  name: huggingface://datasets/llamastack/gpqa_0shot_cot
+  split: test
+  subset: gpqa_main
+providers:
+  - provider_id: deepseek_v3
+    models:
+      - model_id: deepseek-v3
+scoring_function:
+  id: basic::regex_parser_multiple_choice_answer
+output_dir: ./evaluation-results/deepseek-v3-gpqa
