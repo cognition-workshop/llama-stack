@@ -339,6 +339,16 @@ class AgentSessionCreateResponse(BaseModel):
 
 
 @json_schema_type
+class AgentSessionUpdateRequest(BaseModel):
+    """Request to update an agent session.
+
+    :param session_name: The new name for the session.
+    """
+
+    session_name: Optional[str] = None
+
+
+@json_schema_type
 class AgentTurnCreateRequest(AgentConfigOverridablePerTurn):
     agent_id: str
     session_id: str
@@ -544,6 +554,22 @@ class Agents(Protocol):
         """
         ...
 
+    @webmethod(route="/agents/{agent_id}/session/{session_id}", method="PUT")
+    async def update_agents_session(
+        self,
+        agent_id: str,
+        session_id: str,
+        session_name: Optional[str] = None,
+    ) -> Session:
+        """Update an agent session by its ID.
+
+        :param agent_id: The ID of the agent the session belongs to.
+        :param session_id: The ID of the session to update.
+        :param session_name: (Optional) The new name for the session.
+        :returns: The updated Session.
+        """
+        ...
+
     @webmethod(route="/agents/{agent_id}", method="DELETE")
     async def delete_agent(
         self,
@@ -556,9 +582,15 @@ class Agents(Protocol):
         ...
 
     @webmethod(route="/agents", method="GET")
-    async def list_agents(self) -> ListAgentsResponse:
-        """List all agents.
+    async def list_agents(
+        self,
+        limit: Optional[int] = 100,
+        offset: Optional[int] = 0,
+    ) -> ListAgentsResponse:
+        """List all agents with pagination support.
 
+        :param limit: (Optional) Maximum number of agents to return. Defaults to 100.
+        :param offset: (Optional) Number of agents to skip. Defaults to 0.
         :returns: A ListAgentsResponse.
         """
         ...
@@ -576,10 +608,14 @@ class Agents(Protocol):
     async def list_agent_sessions(
         self,
         agent_id: str,
+        limit: Optional[int] = 100,
+        offset: Optional[int] = 0,
     ) -> ListAgentSessionsResponse:
-        """List all session(s) of a given agent.
+        """List all session(s) of a given agent with pagination support.
 
         :param agent_id: The ID of the agent to list sessions for.
+        :param limit: (Optional) Maximum number of sessions to return. Defaults to 100.
+        :param offset: (Optional) Number of sessions to skip. Defaults to 0.
         :returns: A ListAgentSessionsResponse.
         """
         ...

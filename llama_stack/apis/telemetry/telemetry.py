@@ -234,7 +234,7 @@ class Telemetry(Protocol):
     @webmethod(route="/telemetry/traces/{trace_id:path}/spans/{span_id:path}", method="GET")
     async def get_span(self, trace_id: str, span_id: str) -> Span: ...
 
-    @webmethod(route="/telemetry/spans/{span_id:path}/tree", method="POST")
+    @webmethod(route="/telemetry/spans/{span_id:path}/tree", method="GET")
     async def get_span_tree(
         self,
         span_id: str,

@@ -230,13 +230,40 @@ class MetaReferenceAgentsImpl(Agents):
     async def delete_agents_session(self, agent_id: str, session_id: str) -> None:
         await self.persistence_store.delete(f"session:{agent_id}:{session_id}")
 
+    async def update_agents_session(
+        self,
+        agent_id: str,
+        session_id: str,
+        session_name: Optional[str] = None,
+    ) -> Session:
+        agent = await self._get_agent_impl(agent_id)
+        session_info = await agent.storage.get_session_info(session_id)
+        if session_info is None:
+            raise ValueError(f"Session {session_id} not found")
+
+        if session_name is not None:
+            await agent.storage.update_session_info(session_id, session_name=session_name)
+            session_info = await agent.storage.get_session_info(session_id)
+
+        turns = await agent.storage.get_session_turns(session_id)
+        return Session(
+            session_name=session_info.session_name,
+            session_id=session_id,
+            turns=turns,
+            started_at=session_info.started_at,
+        )
+
     async def delete_agent(self, agent_id: str) -> None:
         await self.persistence_store.delete(f"agent:{agent_id}")
 
     async def shutdown(self) -> None:
         pass
 
-    async def list_agents(self) -> ListAgentsResponse:
+    async def list_agents(
+        self,
+        limit: Optional[int] = 100,
+        offset: Optional[int] = 0,
+    ) -> ListAgentsResponse:
         pass
 
     async def get_agent(self, agent_id: str) -> Agent:
@@ -245,5 +272,7 @@ class MetaReferenceAgentsImpl(Agents):
     async def list_agent_sessions(
         self,
         agent_id: str,
+        limit: Optional[int] = 100,
+        offset: Optional[int] = 0,
     ) -> ListAgentSessionsResponse:
         pass
