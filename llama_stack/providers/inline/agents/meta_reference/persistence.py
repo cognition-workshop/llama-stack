@@ -86,6 +86,30 @@ class AgentPersistence:
 
         return session_info
 
+    async def update_session_info(
+        self,
+        session_id: str,
+        session_name: Optional[str] = None,
+    ) -> AgentSessionInfo:
+        """Update session information.
+
+        :param session_id: The ID of the session to update.
+        :param session_name: The new name for the session (optional).
+        :returns: The updated AgentSessionInfo.
+        """
+        session_info = await self.get_session_if_accessible(session_id)
+        if session_info is None:
+            raise ValueError(f"Session {session_id} not found or access denied")
+
+        if session_name is not None:
+            session_info.session_name = session_name
+
+        await self.kvstore.set(
+            key=f"session:{self.agent_id}:{session_id}",
+            value=session_info.model_dump_json(),
+        )
+        return session_info
+
     async def add_vector_db_to_session(self, session_id: str, vector_db_id: str):
         session_info = await self.get_session_if_accessible(session_id)
         if session_info is None:

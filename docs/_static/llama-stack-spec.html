@@ -332,8 +332,27 @@
                 "tags": [
                     "Agents"
                 ],
-                "description": "List all agents.",
-                "parameters": []
+                "description": "List all agents with pagination support.",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "(Optional) Maximum number of agents to return. Defaults to 100.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "(Optional) Number of agents to skip. Defaults to 0.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ]
             },
             "post": {
                 "responses": {
@@ -719,6 +738,66 @@
                         }
                     }
                 ]
+            },
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "The updated Session.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Session"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest400"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/TooManyRequests429"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError500"
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/DefaultError"
+                    }
+                },
+                "tags": [
+                    "Agents"
+                ],
+                "description": "Update an agent session by its ID.",
+                "parameters": [
+                    {
+                        "name": "agent_id",
+                        "in": "path",
+                        "description": "The ID of the agent the session belongs to.",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "session_id",
+                        "in": "path",
+                        "description": "The ID of the session to update.",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateAgentsSessionRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                }
             },
             "delete": {
                 "responses": {
@@ -1413,7 +1492,7 @@
             }
         },
         "/v1/telemetry/spans/{span_id}/tree": {
-            "post": {
+            "get": {
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1450,18 +1529,27 @@
                         "schema": {
                             "type": "string"
                         }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/GetSpanTreeRequest"
+                    },
+                    {
+                        "name": "attributes_to_return",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
                             }
                         }
                     },
-                    "required": true
-                }
+                    {
+                        "name": "max_depth",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ]
             }
         },
         "/v1/tools/{tool_name}": {
@@ -2344,7 +2432,7 @@
                 "tags": [
                     "Agents"
                 ],
-                "description": "List all session(s) of a given agent.",
+                "description": "List all session(s) of a given agent with pagination support.",
                 "parameters": [
                     {
                         "name": "agent_id",
@@ -2353,6 +2441,24 @@
                         "required": true,
                         "schema": {
                             "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "(Optional) Maximum number of sessions to return. Defaults to 100.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "description": "(Optional) Number of sessions to skip. Defaults to 0.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
                         }
                     }
                 ]
@@ -7365,22 +7471,6 @@
                 ],
                 "title": "Span"
             },
-            "GetSpanTreeRequest": {
-                "type": "object",
-                "properties": {
-                    "attributes_to_return": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    },
-                    "max_depth": {
-                        "type": "integer"
-                    }
-                },
-                "additionalProperties": false,
-                "title": "GetSpanTreeRequest"
-            },
             "SpanStatus": {
                 "type": "string",
                 "enum": [
@@ -10152,6 +10242,17 @@
                 ],
                 "title": "SyntheticDataGenerationResponse",
                 "description": "Response from the synthetic data generation. Batch of (prompt, response, score) tuples that pass the threshold."
+            },
+            "UpdateAgentsSessionRequest": {
+                "type": "object",
+                "properties": {
+                    "session_name": {
+                        "type": "string",
+                        "description": "(Optional) The new name for the session."
+                    }
+                },
+                "additionalProperties": false,
+                "title": "UpdateAgentsSessionRequest"
             },
             "VersionInfo": {
                 "type": "object",
